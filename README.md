@@ -54,6 +54,12 @@ api-muse-2026/
 │   ├── app.js                       # Logic xử lý giao diện, SSE reader, copy API
 │   ├── style.css                    # Thiết kế giao diện Glassmorphism cao cấp
 │   └── icons/                       # Biểu tượng dự án
+├── plugins/                         # Vietnamese Drama Muse Plugin & Skills
+│   └── vietnamese-drama-muse/
+│       ├── skills/                  # 5 Kỹ năng AI Drama (Recap, Script, Prompt, Voice, Storyboard)
+│       ├── scripts/                 # CLI Drama Generator & Muse API Bridge
+│       ├── studio/                  # Standalone Drama Studio Viewer
+│       └── export/                  # Thư mục xuất kịch bản, prompt, SRT
 ├── extension/                       # Chrome Extension MV3 Companion
 │   ├── manifest.json                # Cấu hình Manifest V3 sạch sẽ
 │   ├── background.js                # Service worker bắt cookie muse.ai & quản lý proxy
