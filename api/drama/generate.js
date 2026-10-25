@@ -148,8 +148,9 @@ module.exports = async function handler(req, res) {
         dialogueOwner: charName,
         dialogue: dialogueVi,
         rawPrompt: promptLine,
-        // Storyboard image placeholder (using Pollinations / Muse Image Gateway)
-        imageUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(visualEn + ', cinematic drama lighting, photorealistic 8k')}?width=1280&height=720&nologo=true&seed=${i * 1024 + 7}`
+        // Guaranteed fast local visual (no CORS issues, instant loading)
+        imageUrl: `/api/drama/image?scene=${i}&title=${encodeURIComponent(sceneName)}`,
+        aiImageUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(visualEn + ', cinematic drama lighting, photorealistic 8k')}?width=1280&height=720&nologo=true&seed=${i * 1024 + 7}`
       });
 
       fullStoryMarkdown += `### Phân cảnh ${i} (${sceneName})\n`;

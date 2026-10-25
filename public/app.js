@@ -810,6 +810,273 @@ function speakAllScenesSequentially() {
 // ========================================================
 // 🎬 CINEMATIC VIDEO COMPOSER & MEDIA RECORDER ENGINE
 // ========================================================
+let audioCtx = null;
+let currentBgmNode = null;
+
+function initAudioContext() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playDramaticDrone(durationSec) {
+  try {
+    initAudioContext();
+    if (currentBgmNode) {
+      try { currentBgmNode.stop(); } catch {}
+    }
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(65.41, audioCtx.currentTime); // C2 low dramatic drone
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(220, audioCtx.currentTime);
+
+    gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1.5);
+    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + durationSec);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + durationSec);
+    currentBgmNode = osc;
+  } catch (e) {
+    console.warn('WebAudio BGM note:', e);
+  }
+}
+
+function drawProceduralScene(ctx, width, height, sceneNum, progress) {
+  const seed = ((sceneNum - 1) % 6) + 1;
+  const zoom = 1.0 + progress * 0.08;
+  const panX = Math.sin(progress * Math.PI) * 15;
+
+  ctx.save();
+  ctx.translate(width / 2 + panX, height / 2);
+  ctx.scale(zoom, zoom);
+  ctx.translate(-width / 2, -height / 2);
+
+  if (seed === 1) {
+    // Luxury Banquet Hall (Sảnh tiệc xa hoa)
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#1c1106');
+    bgGrad.addColorStop(0.5, '#2a1b0c');
+    bgGrad.addColorStop(1, '#0a0703');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Chandelier Glow
+    const glow = ctx.createRadialGradient(width / 2, 80, 20, width / 2, 80, 450);
+    glow.addColorStop(0, 'rgba(245, 158, 11, 0.55)');
+    glow.addColorStop(0.5, 'rgba(217, 119, 6, 0.18)');
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+
+    // Table & Pillars
+    ctx.fillStyle = '#1e1710';
+    ctx.fillRect(80, 0, 100, height);
+    ctx.fillRect(width - 180, 0, 100, height);
+
+    ctx.fillStyle = '#17120a';
+    ctx.beginPath();
+    ctx.ellipse(width / 2, height - 80, width * 0.48, 140, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+  } else if (seed === 2) {
+    // Dramatic Shards / Rain Tension
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, '#0a0e17');
+    bgGrad.addColorStop(0.6, '#1e1b2e');
+    bgGrad.addColorStop(1, '#05070a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Blue Cold Spotlight
+    const spot = ctx.createRadialGradient(width / 2, height - 120, 30, width / 2, height - 120, 320);
+    spot.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
+    spot.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = spot;
+    ctx.fillRect(0, 0, width, height);
+
+    // Red spilled wine
+    ctx.fillStyle = 'rgba(127, 29, 29, 0.65)';
+    ctx.beginPath();
+    ctx.ellipse(width / 2, height - 130, 90, 25, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+  } else if (seed === 3) {
+    // Night Skyline Balcony
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#030712');
+    bgGrad.addColorStop(0.6, '#0b1329');
+    bgGrad.addColorStop(1, '#02040a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Skyscrapers silhouettes
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(320, 160, 120, height);
+    ctx.fillRect(720, 200, 100, height);
+    ctx.fillRect(840, 240, 140, height);
+
+    // Neon Window Dots
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(360, 220, 6, 6);
+    ctx.fillStyle = '#00d2ff';
+    ctx.fillRect(390, 260, 6, 6);
+    ctx.fillStyle = '#ec4899';
+    ctx.fillRect(750, 240, 6, 6);
+
+    // Balcony Silhouetted Man
+    ctx.fillStyle = '#020617';
+    ctx.beginPath();
+    ctx.arc(width / 2, 420, 36, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(width / 2 - 45, 460, 90, height);
+
+    // Glowing phone
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(width / 2 + 35, 440, 14, 24);
+
+  } else if (seed === 4) {
+    // Executive Desk & Legal Contract
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, '#140f07');
+    bgGrad.addColorStop(0.5, '#24180a');
+    bgGrad.addColorStop(1, '#0a0703');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Desk Lamp Glow
+    const glow = ctx.createRadialGradient(width / 2, 220, 20, width / 2, 220, 380);
+    glow.addColorStop(0, 'rgba(254, 240, 138, 0.35)');
+    glow.addColorStop(0.6, 'rgba(202, 138, 4, 0.12)');
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+
+    // Desk & Contract papers
+    ctx.fillStyle = '#1c1208';
+    ctx.fillRect(200, 360, width - 400, height);
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(width / 2 - 120, 420, 260, 240);
+
+    // Red seal
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(width / 2 + 60, 560, 28, 0, Math.PI * 2);
+    ctx.fill();
+
+  } else if (seed === 5) {
+    // Sunrise Victory
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+    bgGrad.addColorStop(0, '#451a03');
+    bgGrad.addColorStop(0.4, '#b45309');
+    bgGrad.addColorStop(0.7, '#f59e0b');
+    bgGrad.addColorStop(1, '#1e1b4b');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Giant Sun
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath();
+    ctx.arc(width / 2, 380, 140, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Window Architecture
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(220, 0, 16, height);
+    ctx.fillRect(width / 2 - 8, 0, 16, height);
+    ctx.fillRect(width - 240, 0, 16, height);
+
+  } else {
+    // Rainy Room
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#18120c');
+    bgGrad.addColorStop(0.6, '#261b11');
+    bgGrad.addColorStop(1, '#0d0804');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Window with rain
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(width - 480, 100, 360, 320);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(width - 480, 100, 360, 320);
+  }
+
+  ctx.restore();
+}
+
+function drawWrappedSubtitle(ctx, text, x, y, maxWidth, lineHeight, textColor) {
+  if (!text) return;
+  const words = text.split(' ');
+  const lines = [];
+  let currentLine = '';
+
+  ctx.font = 'bold 24px "Plus Jakarta Sans", sans-serif';
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = currentLine + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      lines.push(currentLine.trim());
+      currentLine = words[n] + ' ';
+    } else {
+      currentLine = testLine;
+    }
+  }
+  lines.push(currentLine.trim());
+
+  // Show max 2 lines
+  const displayLines = lines.slice(0, 2);
+  const totalTextHeight = displayLines.length * lineHeight;
+  const startY = y - totalTextHeight;
+
+  // Measure max width for background pill
+  let maxLineWidth = 0;
+  for (const line of displayLines) {
+    const w = ctx.measureText(line).width;
+    if (w > maxLineWidth) maxLineWidth = w;
+  }
+
+  // Draw translucent dark background pill
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.78)';
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(x - maxLineWidth / 2 - 20, startY - 10, maxLineWidth + 40, totalTextHeight + 18, 10);
+  } else {
+    ctx.rect(x - maxLineWidth / 2 - 20, startY - 10, maxLineWidth + 40, totalTextHeight + 18);
+  }
+  ctx.fill();
+
+  // Draw border outline & fill text
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = '#000000';
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+
+  for (let i = 0; i < displayLines.length; i++) {
+    const lineY = startY + i * lineHeight;
+    ctx.strokeText(displayLines[i], x, lineY);
+    ctx.fillText(displayLines[i], x, lineY);
+  }
+  ctx.restore();
+}
+
 async function composeAndRenderVideo(scenes) {
   const canvas = document.getElementById('dramaCanvas');
   const videoOverlay = document.getElementById('videoOverlayEmpty');
@@ -818,20 +1085,31 @@ async function composeAndRenderVideo(scenes) {
   if (!canvas) return;
 
   if (videoOverlay) videoOverlay.style.display = 'none';
+  if (videoPlayer) {
+    videoPlayer.style.display = 'none';
+    videoPlayer.pause();
+  }
+  canvas.style.display = 'block';
 
   const ctx = canvas.getContext('2d');
   const width = canvas.width;
   const height = canvas.height;
 
-  // Pre-load images
+  // Pre-load SVG/Image assets
+  const scenesToRender = scenes.slice(0, Math.min(scenes.length, 12));
   const loadedImages = [];
-  for (const s of scenes.slice(0, 10)) {
+
+  for (const s of scenesToRender) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = s.imageUrl;
+    img.src = s.imageUrl || `/api/drama/image?scene=${s.clipNumber}&title=${encodeURIComponent(s.sceneName || '')}`;
+    
+    // Non-blocking load with fast timeout
     await new Promise(r => {
-      img.onload = () => r();
-      img.onerror = () => r();
+      let done = false;
+      img.onload = () => { if (!done) { done = true; r(); } };
+      img.onerror = () => { if (!done) { done = true; r(); } };
+      setTimeout(() => { if (!done) { done = true; r(); } }, 600);
     });
     loadedImages.push({ img, scene: s });
   }
@@ -846,7 +1124,7 @@ async function composeAndRenderVideo(scenes) {
     try {
       mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
     } catch {
-      console.warn('MediaRecorder not fully supported');
+      console.warn('MediaRecorder not supported');
     }
   }
 
@@ -859,6 +1137,7 @@ async function composeAndRenderVideo(scenes) {
       if (videoPlayer) {
         videoPlayer.src = URL.createObjectURL(currentRecordedVideoBlob);
         videoPlayer.style.display = 'block';
+        videoPlayer.controls = true;
         canvas.style.display = 'none';
       }
       if (downloadBtn) downloadBtn.disabled = false;
@@ -866,10 +1145,15 @@ async function composeAndRenderVideo(scenes) {
     mediaRecorder.start();
   }
 
-  // Animate scenes on Canvas (Ken Burns Zoom + Subtitles Overlay)
-  const durationPerSceneMs = 3000; // 3 seconds preview per scene for instant rendering
+  // Animation timeline
+  const durationPerSceneMs = 3500; // 3.5s per scene
   const totalScenes = loadedImages.length;
+  const totalDurationMs = totalScenes * durationPerSceneMs;
   let startTime = performance.now();
+  let lastSpokenSceneIdx = -1;
+
+  // Play background dramatic drone
+  playDramaticDrone(totalDurationMs / 1000);
 
   function drawFrame(currentTime) {
     const elapsed = currentTime - startTime;
@@ -879,59 +1163,63 @@ async function composeAndRenderVideo(scenes) {
 
     if (!current) return;
 
-    // 1. Draw Image with Ken Burns Zoom (1.0 -> 1.1)
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, width, height);
+    // Trigger AI speech voice for current scene
+    if (sceneIdx !== lastSpokenSceneIdx) {
+      lastSpokenSceneIdx = sceneIdx;
+      const textToSpeak = current.scene.narration + (current.scene.dialogue ? ' ' + current.scene.dialogue : '');
+      speakText(textToSpeak);
+    }
+
+    // 1. Draw Background Image or Procedural Scenery
+    ctx.clearRect(0, 0, width, height);
 
     if (current.img && current.img.complete && current.img.naturalWidth > 0) {
-      const scale = 1.0 + sceneProgress * 0.1;
+      // Ken Burns smooth camera motion
+      const scale = 1.0 + sceneProgress * 0.08;
+      const panX = Math.sin(sceneProgress * Math.PI) * 12;
       const sw = width * scale;
       const sh = height * scale;
-      const sx = -(sw - width) / 2;
+      const sx = -(sw - width) / 2 + panX;
       const sy = -(sh - height) / 2;
       ctx.drawImage(current.img, sx, sy, sw, sh);
     } else {
-      ctx.fillStyle = '#111827';
-      ctx.fillRect(0, 0, width, height);
+      // Procedural artistic scene guaranteed!
+      drawProceduralScene(ctx, width, height, current.scene.clipNumber, sceneProgress);
     }
 
-    // 2. Cinematic Vignette & Bottom Gradient
-    const gradient = ctx.createLinearGradient(0, height - 200, 0, height);
-    gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(1, 'rgba(0,0,0,0.85)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, height - 200, width, 200);
+    // 2. Cinematic Letterbox Bars
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, width, 40);
+    ctx.fillRect(0, height - 40, width, 40);
 
-    // 3. Draw Subtitles
-    const subtitleText = sceneProgress < 0.6 ? current.scene.narration : (current.scene.dialogue ? `[${current.scene.dialogueOwner}]: "${current.scene.dialogue}"` : current.scene.narration);
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-
-    // Subtitle background pill
-    ctx.font = 'bold 26px "Plus Jakarta Sans", sans-serif';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 6;
-    ctx.strokeText(subtitleText, width / 2, height - 40);
-
-    ctx.fillStyle = sceneProgress < 0.6 ? '#fef08a' : '#ffffff';
-    ctx.fillText(subtitleText, width / 2, height - 40);
-
-    // 4. Clip watermarking badge
-    ctx.font = '600 16px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    // 3. Top Watermark & Scene Title
+    ctx.font = '600 15px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.textAlign = 'left';
-    ctx.fillText(`PROMPT ${String(current.scene.clipNumber).padStart(3, '0')} | VIETNAMESE DRAMA MUSE PRO`, 30, 45);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`PROMPT ${String(current.scene.clipNumber).padStart(3, '0')} | VIETNAMESE DRAMA MUSE STUDIO PRO`, 30, 20);
 
-    // Update time tracker
+    ctx.font = '500 13px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#f59e0b';
+    ctx.textAlign = 'right';
+    ctx.fillText(current.scene.sceneName || '', width - 30, 20);
+
+    // 4. Subtitle Drawing with Multi-line Wrapping & Translucent Pill
+    const isNarration = sceneProgress < 0.58;
+    const subText = isNarration ? current.scene.narration : (current.scene.dialogue ? `[${current.scene.dialogueOwner}]: "${current.scene.dialogue}"` : current.scene.narration);
+    const subColor = isNarration ? '#fef08a' : '#ffffff';
+
+    drawWrappedSubtitle(ctx, subText, width / 2, height - 60, width - 240, 32, subColor);
+
+    // 5. Update Time Tracker
     const timeTrackEl = document.getElementById('videoTimeTrack');
     if (timeTrackEl) {
       const curSec = Math.floor(elapsed / 1000);
-      const totalSec = Math.floor((totalScenes * durationPerSceneMs) / 1000);
+      const totalSec = Math.floor(totalDurationMs / 1000);
       timeTrackEl.textContent = `00:${String(curSec).padStart(2, '0')} / 00:${String(totalSec).padStart(2, '0')}`;
     }
 
-    if (elapsed < totalScenes * durationPerSceneMs) {
+    if (elapsed < totalDurationMs) {
       canvasAnimId = requestAnimationFrame(drawFrame);
     } else {
       if (mediaRecorder && mediaRecorder.state === 'recording') {

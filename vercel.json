@@ -21,6 +21,7 @@
     { "source": "/api/auth/extract-session", "destination": "/api/auth/extract-session" },
     { "source": "/api/auth/status", "destination": "/api/auth/status" },
     { "source": "/api/drama/generate", "destination": "/api/drama/generate" },
+    { "source": "/api/drama/image", "destination": "/api/drama/image" },
     { "source": "/api/accounts", "destination": "/api/accounts" },
     { "source": "/api/proxy-check", "destination": "/api/proxy-check" },
     { "source": "/", "destination": "/public/index.html" },

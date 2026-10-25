@@ -97,6 +97,9 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/drama/generate') {
     return handleApiRoute(req, res, './api/drama/generate');
   }
+  if (pathname === '/api/drama/image') {
+    return handleApiRoute(req, res, './api/drama/image');
+  }
   if (pathname === '/api/accounts') {
     return handleApiRoute(req, res, './api/accounts');
   }
