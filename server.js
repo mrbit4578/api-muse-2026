@@ -88,6 +88,9 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/v1/models') {
     return handleApiRoute(req, res, './api/v1/models');
   }
+  if (pathname === '/v1/videos' || pathname.startsWith('/v1/videos/')) {
+    return handleApiRoute(req, res, './api/v1/videos');
+  }
   if (pathname === '/api/auth/login') {
     return handleApiRoute(req, res, './api/auth/login');
   }
@@ -96,6 +99,12 @@ const server = http.createServer(async (req, res) => {
   }
   if (pathname === '/api/auth/status') {
     return handleApiRoute(req, res, './api/auth/status');
+  }
+  if (pathname === '/api/auth/keepalive') {
+    return handleApiRoute(req, res, './api/auth/keepalive');
+  }
+  if (pathname === '/api/auth/mailtm-otp') {
+    return handleApiRoute(req, res, './api/auth/mailtm-otp');
   }
   if (pathname === '/api/drama/generate') {
     return handleApiRoute(req, res, './api/drama/generate');

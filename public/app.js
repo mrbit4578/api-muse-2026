@@ -1278,3 +1278,107 @@ function downloadAllDramaAssets() {
   a.click();
   alert('Đã tải trọn bộ hồ sơ sản xuất phim Drama (.json)! Bạn có thể tải thêm file .SRT và .WEBM ở các nút bên cạnh.');
 }
+
+
+// ==========================================
+// ⚡ KAIZEN UTILITIES: MAIL.TM & KEEPALIVE
+// ==========================================
+let mailTmPollInterval = null;
+let currentMailTmToken = null;
+
+async function createMailTmTempMail() {
+  const btn = document.getElementById('btnMailTmCreate');
+  const statusBox = document.getElementById('mailTmStatusBox');
+  const statusText = document.getElementById('mailTmStatusText');
+  const emailDisplay = document.getElementById('mailTmEmailDisplay');
+  const otpResult = document.getElementById('mailTmOtpResult');
+  const inputEmail = document.getElementById('inputEmail');
+
+  btn.disabled = true;
+  statusBox.style.display = 'block';
+  statusText.textContent = 'Đang khởi tạo email tạm... ⏳';
+  otpResult.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/auth/mailtm-otp?action=create', { method: 'POST' });
+    const data = await res.json();
+
+    if (!data.success) throw new Error(data.error || 'Lỗi tạo mail');
+
+    currentMailTmToken = data.token;
+    emailDisplay.textContent = data.email;
+    if (inputEmail) inputEmail.value = data.email;
+
+    statusText.textContent = 'Đang lắng nghe mã OTP từ Muse... ⏳';
+    
+    // Copy email to clipboard automatically
+    navigator.clipboard.writeText(data.email);
+    alert(`🎉 Đã tạo thành công Email tạm:\n\n${data.email}\n\n(Đã tự động copy vào bộ nhớ tạm & điền vào ô đăng nhập. Hãy bấm gửi mã trên muse.ai!)`);
+
+    // Start auto polling OTP every 3 seconds for up to 5 minutes
+    if (mailTmPollInterval) clearInterval(mailTmPollInterval);
+    let attempts = 0;
+    mailTmPollInterval = setInterval(async () => {
+      attempts++;
+      if (attempts > 100) {
+        clearInterval(mailTmPollInterval);
+        statusText.textContent = 'Hết thời gian chờ (5 phút).';
+        return;
+      }
+      try {
+        const pollRes = await fetch('/api/auth/mailtm-otp?action=poll', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: currentMailTmToken })
+        });
+        const pollData = await pollRes.json();
+        if (pollData.found && pollData.code) {
+          clearInterval(mailTmPollInterval);
+          statusText.textContent = 'Đã nhận được mã OTP!';
+          otpResult.style.display = 'block';
+          otpResult.textContent = `🔑 Mã OTP: ${pollData.code} (${pollData.subject})`;
+          const inputPwd = document.getElementById('inputPassword');
+          if (inputPwd) inputPwd.value = pollData.code;
+          navigator.clipboard.writeText(pollData.code);
+          alert(`🎉 ĐÃ NHẬN ĐƯỢC MÃ OTP TỪ MUSE:\n\n${pollData.code}\n\n(Đã tự động điền vào ô Mật khẩu/OTP!)`);
+        }
+      } catch (e) {
+        console.warn('Poll OTP note:', e);
+      }
+    }, 3000);
+
+  } catch (err) {
+    alert('Lỗi tạo Mail.tm: ' + err.message);
+    statusBox.style.display = 'none';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function wakeCloudVmAndRenew() {
+  const btn = document.getElementById('btnKeepaliveWake');
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang đánh thức VM...';
+
+  try {
+    const res = await fetch('/api/auth/keepalive', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currentApiKey}`
+      }
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert(`✅ THÀNH CÔNG:\n\n${data.message}\n\nCloud VM: ${data.vmState}\nVM ID: ${data.vmId}`);
+    } else {
+      alert('Thông báo: ' + data.message);
+    }
+  } catch (err) {
+    alert('Lỗi keepalive: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🛡️ <strong>Giữ Phiên 48h & Wake VM</strong><div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Gia hạn hatch_vml & VM</div>';
+  }
+}

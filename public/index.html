@@ -138,6 +138,41 @@
             </form>
 
             <div id="authNotice" class="alert-box" hidden></div>
+
+            <!-- Extra Kaizen Utilities (Mail.tm & Keepalive & UserScript) -->
+            <div class="quick-tools-panel" style="margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border-glass);">
+              <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                <span>⚡ Tiện ích Kaizen Tự Động (Từ Muse2API)</span>
+                <span class="badge-mini" style="background: rgba(0, 210, 255, 0.15); color: #00d2ff; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Pro v2.1</span>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button type="button" class="btn-secondary" id="btnMailTmCreate" onclick="createMailTmTempMail()" style="font-size: 12px; padding: 8px 10px; text-align: left; cursor: pointer;">
+                  📧 <strong>Tạo Email Ảo Mail.tm</strong>
+                  <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Tự sinh email & bắt OTP</div>
+                </button>
+                <button type="button" class="btn-secondary" id="btnKeepaliveWake" onclick="wakeCloudVmAndRenew()" style="font-size: 12px; padding: 8px 10px; text-align: left; cursor: pointer;">
+                  🛡️ <strong>Giữ Phiên 48h & Wake VM</strong>
+                  <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Gia hạn hatch_vml & VM</div>
+                </button>
+              </div>
+
+              <!-- Live Mail.tm Status Banner -->
+              <div id="mailTmStatusBox" style="display: none; margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.2); font-size: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong style="color: #00d2ff;">📬 Hòm thư tạm Mail.tm:</strong>
+                  <span id="mailTmStatusText" style="color: #f59e0b;">Đang lắng nghe OTP... ⏳</span>
+                </div>
+                <div style="margin-top: 4px; font-family: monospace; color: #fff; word-break: break-all;" id="mailTmEmailDisplay"></div>
+                <div id="mailTmOtpResult" style="margin-top: 6px; display: none; font-size: 13px; color: #10b981; font-weight: bold;"></div>
+              </div>
+
+              <!-- Tampermonkey UserScript Link -->
+              <div style="margin-top: 10px; font-size: 11px; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between;">
+                <span>Chạy Tampermonkey trên muse.ai:</span>
+                <a href="/muse_cookie_importer.user.js" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: 600;">⚡ Cài đặt UserScript ↗</a>
+              </div>
+            </div>
           </div>
 
           <!-- Active API Key & Tokens Result -->

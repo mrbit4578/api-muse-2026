@@ -19,18 +19,23 @@
 2. **Cổng API Chuẩn OpenAI 100%**:
    - `POST /v1/chat/completions`: Hỗ trợ cả **Streaming SSE** (gõ chữ từng từ) lẫn Non-Streaming.
    - `POST /v1/images/generations`: Tạo ảnh nghệ thuật độ phân giải cao.
+   - `POST /v1/videos` & `GET /v1/videos/{task_id}`: Chuẩn OpenAI Video API sinh video nghệ thuật.
    - `GET /v1/models`: Danh sách các model (`muse-spark-1.1`, `muse-chat-v2`, `muse-omni-flash`, `gpt-4o-muse`, `dall-e-3-muse`).
    - Tương thích lập tức với **NextChat**, **LobeChat**, **Cherry Studio**, **TypingMind**, **Cursor**, **OpenAI Python/Node SDK**.
-3. **Triển khai Web Online trên Vercel**:
+3. **Giữ Phiên 48h & Đánh Thức Cloud VM (Kế thừa từ Muse2API)**:
+   - Tự động gọi `/api/session` và `/api/hatch/vm/wake` gia hạn token `hatch_vml` (+48h) và `hatch_sess` (+30d).
+   - Đảm bảo máy ảo làm việc (Cloud Workspace VM) luôn ở trạng thái `RUNNING`, không bị ngắt kết nối.
+4. **Tạo Email Ảo & Bắt Mã OTP Tự Động (Mail.tm)**:
+   - Tích hợp giao thức Mail.tm: Tự sinh email tạm thời với 1 click, tự động lắng nghe và trích xuất mã OTP từ Muse mà không cần tạo email thủ công.
+5. **Đồng Bộ Cookie Đa Nền Tảng (Tampermonkey UserScript & Extension)**:
+   - Cung cấp script Tampermonkey (`/muse_cookie_importer.user.js`) hiển thị nút nổi trên `muse.ai` để đẩy token về Gateway.
+   - Tiện ích Chrome Extension v5.0.0 Pro quét cookie chỉ bằng 1 click.
+6. **Xưởng Phim Vietnamese Drama Muse Studio Pro**:
+   - Tự động sản xuất kịch bản 3 hồi, 20+ Prompts IVS, phụ đề SRT chuẩn millisecond, Storyboard keyframes và xuất video hoàn chỉnh kèm giọng lồng tiếng AI.
+7. **Triển khai Web Online trên Vercel**:
    - File cấu hình `vercel.json` tối ưu cho Serverless Functions và CORS.
    - Giao diện Dashboard Web hiện đại (Dark Glassmorphism, Responsive, tiếng Việt / English).
    - Tích hợp sẵn **AI Playground** để trò chuyện trực tiếp và sinh ảnh ngay trên trình duyệt.
-4. **Quản lý Account Pool**:
-   - Hỗ trợ thêm nhiều tài khoản Muse, theo dõi hạn mức (Quota), tự động luân chuyển và cân bằng tải.
-5. **Tiện ích Chrome Extension v5.0.0 Pro**:
-   - Đã gỡ bỏ 100% mã độc bẫy `debugger;`, xóa bỏ rào cản khóa bản quyền cũ.
-   - Tính năng **1-Click Auto Grab**: Quét nhanh cookie `muse.ai` từ tab đang đăng nhập và gửi về Web App.
-   - Tích hợp bộ chuyển đổi Proxy (SOCKS5, HTTP, HTTPS) kèm tính năng bảo mật Kill Switch.
 
 ---
 
