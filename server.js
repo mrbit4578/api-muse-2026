@@ -74,6 +74,9 @@ const server = http.createServer(async (req, res) => {
     this.setHeader('Content-Type', 'application/json');
     this.end(JSON.stringify(data));
   };
+  res.send = function(data) {
+    this.end(data);
+  };
 
   // Route mapping
   if (pathname === '/v1/chat/completions') {

@@ -760,11 +760,15 @@ async function renderDramaStoryboard(scenes) {
     <div class="sb-card">
       <div class="sb-img-wrapper">
         <span class="sb-badge">Clip ${s.clipNumber}</span>
-        <img src="${s.imageUrl}" alt="Phân cảnh ${s.clipNumber}" loading="lazy">
+        <img src="${s.imageUrl}" alt="Phân cảnh ${s.clipNumber}" loading="lazy" onerror="this.onerror=null;this.src='/api/drama/image?scene=${s.clipNumber}&title=${encodeURIComponent(s.sceneName || '')}'">
       </div>
       <div class="sb-content">
         <div class="sb-scene-title">${s.sceneName}</div>
-        <div class="sb-voice-preview">"${s.narration.slice(0, 45)}..."</div>
+        <div class="sb-voice-preview">"${s.narration.slice(0, 50)}..."</div>
+        <div style="margin-top: 8px; display: flex; gap: 6px;">
+          <a href="${s.imageUrl}" target="_blank" class="btn-copy-mini" style="text-decoration:none; display:inline-block; font-size:11px;">🔍 Xem HD</a>
+          <button type="button" class="btn-copy-mini" onclick="copyPromptItem(${s.clipNumber - 1})" style="font-size:11px;">📋 Prompt</button>
+        </div>
       </div>
     </div>
   `).join('');

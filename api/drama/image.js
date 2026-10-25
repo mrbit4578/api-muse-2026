@@ -16,7 +16,18 @@ module.exports = async function handler(req, res) {
   const svgContent = generateCinematicSceneSVG(sceneNum, title, mood);
 
   res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
-  return res.status(200).send(svgContent);
+  if (typeof res.send === 'function') {
+    res.statusCode = 200;
+    return res.send(svgContent);
+  }
+  if (typeof res.status === 'function') {
+    try {
+      const s = res.status(200);
+      if (s && typeof s.send === 'function') return s.send(svgContent);
+    } catch {}
+  }
+  res.statusCode = 200;
+  return res.end(svgContent);
 };
 
 function generateCinematicSceneSVG(sceneNum, title, mood) {
@@ -210,12 +221,6 @@ function generateCinematicSceneSVG(sceneNum, title, mood) {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
       <defs>
         ${gradientDef}
-        <filter id="vignette">
-          <feRadialGradient cx="50%" cy="50%" r="70%">
-            <stop offset="60%" stop-color="#000" stop-opacity="0" />
-            <stop offset="100%" stop-color="#000" stop-opacity="0.75" />
-          </feRadialGradient>
-        </filter>
       </defs>
       <!-- Base Background -->
       <rect width="1280" height="720" fill="url(#bgGrad)" />
@@ -224,8 +229,21 @@ function generateCinematicSceneSVG(sceneNum, title, mood) {
       <!-- Cinematic Top & Bottom Bars (Letterbox) -->
       <rect x="0" y="0" width="1280" height="42" fill="#000000" opacity="0.85" />
       <rect x="0" y="678" width="1280" height="42" fill="#000000" opacity="0.85" />
-      <!-- Film Grain Overlay -->
-      <rect width="1280" height="720" fill="transparent" opacity="0.1" />
+      <!-- Scene Watermark Header -->
+      <text x="30" y="27" fill="#ffffff" opacity="0.8" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="600">VIETNAMESE DRAMA MUSE PRO | SCENE ${sceneNum}</text>
+      <text x="1250" y="27" fill="#f59e0b" opacity="0.9" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="500" text-anchor="end">${escapeXml(title || 'Phân cảnh ' + sceneNum)}</text>
     </svg>
   `.trim();
+}
+
+function escapeXml(unsafe) {
+  return String(unsafe).replace(/[<>&'"]/g, c => {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case '\'': return '&apos;';
+      case '"': return '&quot;';
+    }
+  });
 }
