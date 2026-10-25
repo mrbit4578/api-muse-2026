@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Muse 2026 - OpenAI Compatible Gateway & Auto Token Extractor</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="icons/icon48.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <!-- Glow Backgrounds -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-layout">
+    <!-- Navigation Header -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="logo-box">
+          <span class="logo-icon">⚡</span>
+        </div>
+        <div class="brand-text">
+          <h1>API MUSE <span class="badge-year">2026</span></h1>
+          <p class="tagline">OpenAI-Compatible Gateway & Auto Account Extractor</p>
+        </div>
+      </div>
+
+      <div class="nav-metrics">
+        <div class="metric-pill">
+          <span class="dot live"></span>
+          <span class="metric-label">Vercel Serverless:</span>
+          <strong id="gwStatus">Đang kết nối...</strong>
+        </div>
+        <div class="metric-pill">
+          <span class="metric-label">Tài khoản Live:</span>
+          <strong id="accCount">0</strong>
+        </div>
+        <a href="https://github.com/mrbit4578/api-muse-2026" target="_blank" class="github-btn" title="GitHub Repository">
+          <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <div class="tabs-container">
+      <nav class="nav-tabs">
+        <button class="tab-link active" data-tab="tab-login">
+          <span class="tab-icon">🔑</span>
+          <span>Đăng nhập & Lấy API</span>
+        </button>
+        <button class="tab-link" data-tab="tab-integrate">
+          <span class="tab-icon">🔌</span>
+          <span>Kết nối App (OpenAI)</span>
+        </button>
+        <button class="tab-link" data-tab="tab-playground">
+          <span class="tab-icon">💬</span>
+          <span>AI Playground (Chat & Ảnh)</span>
+        </button>
+        <button class="tab-link" data-tab="tab-accounts">
+          <span class="tab-icon">👥</span>
+          <span>Quản lý Tài khoản</span>
+        </button>
+        <button class="tab-link" data-tab="tab-extension">
+          <span class="tab-icon">🧩</span>
+          <span>Chrome Extension</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Main Content Panes -->
+    <main class="main-content">
+      <!-- TAB 1: LOGIN & AUTO GET API -->
+      <section id="tab-login" class="tab-pane active">
+        <div class="grid-2col">
+          <!-- Login Box -->
+          <div class="glass-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="icon-glow">🚀</span>
+                <h2>Auto Login Muse & Trích xuất API</h2>
+              </div>
+              <p class="card-desc">Chỉ cần nhập thông tin tài khoản Muse, hệ thống tự động bóc tách bộ token và kích hoạt API Key chuẩn OpenAI.</p>
+            </div>
+
+            <div class="auth-toggle-group">
+              <button type="button" class="auth-toggle-btn active" id="btnModeCreds">Tài khoản (Email / Mật khẩu)</button>
+              <button type="button" class="auth-toggle-btn" id="btnModeCookie">Dán Cookie / Session</button>
+            </div>
+
+            <!-- Form Credentials -->
+            <form id="formCredentials" class="auth-form">
+              <div class="form-group">
+                <label>Email tài khoản Muse / Meta</label>
+                <div class="input-wrapper">
+                  <span class="input-icon">✉️</span>
+                  <input type="email" id="inputEmail" placeholder="your_email@gmail.com" required autocomplete="email">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Mật khẩu hoặc Mã xác thực (OTP / Code)</label>
+                <div class="input-wrapper">
+                  <span class="input-icon">🔒</span>
+                  <input type="password" id="inputPassword" placeholder="Nhập mật khẩu hoặc mã xác thực...">
+                </div>
+                <small class="field-hint">Hệ thống hỗ trợ cả đăng nhập mật khẩu lẫn mã OTP gửi về email.</small>
+              </div>
+
+              <button type="submit" class="btn-primary" id="btnSubmitLogin">
+                <span class="btn-text">Đăng nhập & Tự động lấy API Muse ⚡</span>
+                <span class="spinner" hidden></span>
+              </button>
+            </form>
+
+            <!-- Form Cookie Paste -->
+            <form id="formCookie" class="auth-form" style="display: none;">
+              <div class="form-group">
+                <label>Dán chuỗi Cookie từ tab muse.ai (F12 hoặc Extension)</label>
+                <textarea id="inputCookieStr" rows="4" placeholder="hatch_sess=...; hatch_gw=...; hatch_vml=...; hatch_native_auth_device=..."></textarea>
+                <small class="field-hint">Hệ thống tự động lọc ra các token quan trọng của Muse và kích hoạt API ngay.</small>
+              </div>
+
+              <button type="submit" class="btn-primary" id="btnSubmitCookie">
+                <span class="btn-text">Trích xuất Token & Kích hoạt API ⚡</span>
+                <span class="spinner" hidden></span>
+              </button>
+            </form>
+
+            <div id="authNotice" class="alert-box" hidden></div>
+          </div>
+
+          <!-- Active API Key & Tokens Result -->
+          <div class="glass-card result-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="icon-glow">✨</span>
+                <h2>Thông tin API Muse 2026</h2>
+              </div>
+              <span id="badgeActiveStatus" class="status-tag inactive">Chưa kích hoạt</span>
+            </div>
+
+            <div class="result-body">
+              <!-- API Key Box -->
+              <div class="info-group">
+                <label>API Key (OpenAI Compatible Bearer Token):</label>
+                <div class="copy-box">
+                  <input type="text" id="displayApiKey" readonly value="Vui lòng đăng nhập để tạo API Key">
+                  <button type="button" class="btn-copy" onclick="copyField('displayApiKey')">Copy</button>
+                </div>
+              </div>
+
+              <!-- Base URL Box -->
+              <div class="info-group">
+                <label>API Base URL (Dán vào NextChat / LobeChat / Cherry Studio):</label>
+                <div class="copy-box">
+                  <input type="text" id="displayBaseUrl" readonly value="https://api-muse-2026.vercel.app/v1">
+                  <button type="button" class="btn-copy" onclick="copyField('displayBaseUrl')">Copy</button>
+                </div>
+              </div>
+
+              <!-- Extracted Tokens Box -->
+              <div class="token-details-accordion">
+                <div class="accordion-header" onclick="toggleTokensAccordion()">
+                  <span>🔍 Chi tiết Tokens Muse đã trích xuất (Hatch Cookies)</span>
+                  <span id="accordionArrow">▼</span>
+                </div>
+                <div id="tokensAccordionContent" class="accordion-content" hidden>
+                  <div class="token-row">
+                    <span>hatch_sess:</span>
+                    <code id="valHatchSess">-</code>
+                  </div>
+                  <div class="token-row">
+                    <span>hatch_gw:</span>
+                    <code id="valHatchGw">-</code>
+                  </div>
+                  <div class="token-row">
+                    <span>hatch_vml:</span>
+                    <code id="valHatchVml">-</code>
+                  </div>
+                  <div class="token-row">
+                    <span>hatch_native_auth_device:</span>
+                    <code id="valHatchDevice">-</code>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quota Bar -->
+              <div class="quota-container">
+                <div class="quota-labels">
+                  <span>Hạn mức truy vấn (Quota):</span>
+                  <strong id="quotaNumbers">998,760 / 1,000,000 tokens</strong>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="quotaFill" style="width: 15%;"></div>
+                </div>
+              </div>
+
+              <div class="quick-test-actions">
+                <button type="button" class="btn-secondary" onclick="switchTab('tab-playground')">Mở AI Playground test ngay 💬</button>
+                <button type="button" class="btn-secondary" onclick="switchTab('tab-integrate')">Xem hướng dẫn cấu hình App 🔌</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: INTEGRATION & APP GUIDES -->
+      <section id="tab-integrate" class="tab-pane">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="icon-glow">🔌</span>
+              <h2>Tích hợp vào các phần mềm AI (OpenAI Compatible)</h2>
+            </div>
+            <p class="card-desc">API Muse 2026 hỗ trợ 100% chuẩn OpenAI. Bạn có thể sử dụng trực tiếp trên mọi ứng dụng client AI yêu thích.</p>
+          </div>
+
+          <div class="integration-grid">
+            <!-- NextChat / ChatGPT-Next-Web -->
+            <div class="integ-item">
+              <div class="integ-head">
+                <span class="app-icon">🤖</span>
+                <h3>NextChat (ChatGPT-Next-Web)</h3>
+              </div>
+              <p>Mở Cài đặt (Settings) trong NextChat:</p>
+              <ul>
+                <li><strong>Endpoint:</strong> <code class="inline-code" id="codeNextChatUrl">https://.../v1</code></li>
+                <li><strong>API Key:</strong> <code class="inline-code" id="codeNextChatKey">sk-muse-...</code></li>
+                <li><strong>Custom Models:</strong> <code>muse-spark-1.1,muse-chat-v2,gpt-4o-muse</code></li>
+              </ul>
+            </div>
+
+            <!-- LobeChat -->
+            <div class="integ-item">
+              <div class="integ-head">
+                <span class="app-icon">🔮</span>
+                <h3>LobeChat</h3>
+              </div>
+              <p>Cài đặt > AI Provider > OpenAI:</p>
+              <ul>
+                <li><strong>API Key:</strong> <code class="inline-code" id="codeLobeKey">sk-muse-...</code></li>
+                <li><strong>API Proxy Address:</strong> <code class="inline-code" id="codeLobeUrl">https://.../v1</code></li>
+                <li><strong>Check Connection:</strong> Đạt chuẩn 100% phản hồi.</li>
+              </ul>
+            </div>
+
+            <!-- Cherry Studio -->
+            <div class="integ-item">
+              <div class="integ-head">
+                <span class="app-icon">🍒</span>
+                <h3>Cherry Studio / TypingMind</h3>
+              </div>
+              <p>Thêm nhà cung cấp OpenAI tương thích:</p>
+              <ul>
+                <li><strong>Base URL:</strong> <code class="inline-code" id="codeCherryUrl">https://.../v1</code></li>
+                <li><strong>API Key:</strong> <code class="inline-code" id="codeCherryKey">sk-muse-...</code></li>
+              </ul>
+            </div>
+
+            <!-- cURL & Python SDK -->
+            <div class="integ-item full-width">
+              <div class="integ-head">
+                <span class="app-icon">💻</span>
+                <h3>Gọi trực tiếp bằng cURL / Python / Node.js</h3>
+              </div>
+              <pre><code class="code-block">curl https://api-muse-2026.vercel.app/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-muse-your-key" \
+  -d '{
+    "model": "muse-spark-1.1",
+    "messages": [{"role": "user", "content": "Xin chào Muse AI!"}],
+    "stream": true
+  }'</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: PLAYGROUND (CHAT & IMAGE) -->
+      <section id="tab-playground" class="tab-pane">
+        <div class="playground-layout">
+          <!-- Chat Sidebar Settings -->
+          <div class="glass-card pg-sidebar">
+            <h3>Cấu hình Model</h3>
+            <div class="form-group">
+              <label>Model Muse</label>
+              <select id="pgModel">
+                <option value="muse-spark-1.1">muse-spark-1.1 (Mạnh nhất - Mặc định)</option>
+                <option value="muse-chat-v2">muse-chat-v2 (Nhanh & Tối ưu tiếng Việt)</option>
+                <option value="muse-omni-flash">muse-omni-flash (Tốc độ phản hồi cực nhanh)</option>
+                <option value="gpt-4o-muse">gpt-4o-muse (OpenAI Alias)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Chế độ phản hồi</label>
+              <div class="toggle-row">
+                <label class="switch">
+                  <input type="checkbox" id="pgStream" checked>
+                  <span class="slider round"></span>
+                </label>
+                <span>Streaming SSE (Gõ chữ từng từ)</span>
+              </div>
+            </div>
+
+            <div class="pg-mode-selector">
+              <button type="button" class="mode-btn active" id="btnModeChat" onclick="setPlaygroundMode('chat')">💬 Hội thoại (Chat)</button>
+              <button type="button" class="mode-btn" id="btnModeImage" onclick="setPlaygroundMode('image')">🎨 Sinh ảnh (Image)</button>
+            </div>
+
+            <button type="button" class="btn-secondary full-width" onclick="clearPlaygroundChat()">Xóa lịch sử chat 🧹</button>
+          </div>
+
+          <!-- Chat Window -->
+          <div class="glass-card pg-chat-box">
+            <!-- Chat Pane -->
+            <div id="pgChatPane" class="pg-pane active">
+              <div class="chat-messages" id="chatMessages">
+                <div class="message system">
+                  <div class="msg-bubble">
+                    👋 Chào mừng bạn đến với **AI Playground**. Hãy nhập tin nhắn bên dưới để trò chuyện cùng Muse AI qua chuẩn streaming API.
+                  </div>
+                </div>
+              </div>
+
+              <form id="chatForm" class="chat-input-bar">
+                <input type="text" id="chatInput" placeholder="Nhập câu hỏi hoặc yêu cầu..." autocomplete="off">
+                <button type="submit" class="btn-send" id="btnSendChat">Gửi 🚀</button>
+              </form>
+            </div>
+
+            <!-- Image Pane -->
+            <div id="pgImagePane" class="pg-pane" style="display: none;">
+              <div class="image-generator-box">
+                <div class="form-group">
+                  <label>Mô tả bức ảnh bạn muốn tạo (Prompt):</label>
+                  <textarea id="imagePrompt" rows="3" placeholder="A futuristic cyberpunk city with neon lights and flying cars, ultra-detailed 8k..."></textarea>
+                </div>
+                <button type="button" class="btn-primary" id="btnGenImage" onclick="generateImage()">Tạo ảnh AI 🎨</button>
+
+                <div id="imageResultContainer" class="image-result-grid">
+                  <!-- Images will render here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: ACCOUNT POOL -->
+      <section id="tab-accounts" class="tab-pane">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="icon-glow">👥</span>
+              <h2>Hệ thống Account Pool (Cân bằng tải & Multi-Account)</h2>
+            </div>
+            <button class="btn-secondary" onclick="loadAccountsList()">Làm mới danh sách 🔄</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Tài khoản</th>
+                  <th>Gói / Plan</th>
+                  <th>API Key</th>
+                  <th>Hạn mức Quota</th>
+                  <th>Trạng thái</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="accountsTableBody">
+                <tr>
+                  <td colspan="6" class="text-center">Đang tải danh sách tài khoản...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: EXTENSION COMPANION -->
+      <section id="tab-extension" class="tab-pane">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="icon-glow">🧩</span>
+              <h2>Chrome Extension Trợ lý Đồng bộ Muse 2026</h2>
+            </div>
+            <p class="card-desc">Cài đặt tiện ích mở rộng vào trình duyệt Google Chrome để tự động phát hiện và đồng bộ phiên đăng nhập Muse sang Web App chỉ với 1 click.</p>
+          </div>
+
+          <div class="extension-guide-grid">
+            <div class="guide-step">
+              <div class="step-num">1</div>
+              <h4>Tải thư mục Extension</h4>
+              <p>Mã nguồn extension nằm trong thư mục <code>/extension</code> của dự án.</p>
+            </div>
+            <div class="guide-step">
+              <div class="step-num">2</div>
+              <h4>Bật Developer Mode</h4>
+              <p>Vào <code>chrome://extensions</code> trên Chrome, bật công tắc <strong>Developer mode</strong> ở góc phải trên.</p>
+            </div>
+            <div class="guide-step">
+              <div class="step-num">3</div>
+              <h4>Load Unpacked</h4>
+              <p>Bấm nút <strong>Load unpacked</strong> và chọn thư mục <code>extension</code> của dự án.</p>
+            </div>
+            <div class="guide-step">
+              <div class="step-num">4</div>
+              <h4>1-Click Auto Sync</h4>
+              <p>Đăng nhập vào <code>https://muse.ai</code>, mở extension và bấm <strong>"Auto-Get Muse API & Sync"</strong>!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>© 2026 <strong>API Muse 2026</strong> · Thiết kế và tối ưu bởi <strong>Mr.Bit25</strong> · Vercel Ready ⚡</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
