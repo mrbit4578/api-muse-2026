@@ -55,6 +55,10 @@
           <span class="tab-icon">🔑</span>
           <span>Đăng nhập & Lấy API</span>
         </button>
+        <button class="tab-link" data-tab="tab-drama">
+          <span class="tab-icon">🎬</span>
+          <span>Xưởng Phim Drama Muse</span>
+        </button>
         <button class="tab-link" data-tab="tab-integrate">
           <span class="tab-icon">🔌</span>
           <span>Kết nối App (OpenAI)</span>
@@ -202,9 +206,227 @@
                 </div>
               </div>
 
-              <div class="quick-test-actions">
+              <div class="quick-test-actions" style="flex-wrap: wrap;">
+                <button type="button" class="btn-primary" style="width: 100%; margin-bottom: 8px; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);" onclick="goToDramaStudioWithKey()">🎬 Tạo Phim Drama với Key này ngay ➜</button>
                 <button type="button" class="btn-secondary" onclick="switchTab('tab-playground')">Mở AI Playground test ngay 💬</button>
                 <button type="button" class="btn-secondary" onclick="switchTab('tab-integrate')">Xem hướng dẫn cấu hình App 🔌</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: VIETNAMESE DRAMA MUSE STUDIO -->
+      <section id="tab-drama" class="tab-pane">
+        <div class="glass-card" style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                🎬 VIETNAMESE DRAMA MUSE <span class="badge-year" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);">STUDIO V5.2 PRO</span>
+              </h2>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                Đấu nối trực tiếp với <strong>API Muse 2026 Gateway</strong>: Tự động chạy Kịch bản ➜ Chuỗi Prompt ➜ Phụ đề SRT ➜ Storyboard Keyframes ➜ Lồng tiếng Voice ➜ Dựng phim & Xuất Video.
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="metric-pill" style="border-color: rgba(245, 158, 11, 0.3);">
+                <span class="dot live" style="background: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+                <span>Khóa API:</span>
+                <strong id="dramaBoundApiKey" style="color: #38bdf8; font-family: var(--font-mono); font-size: 12px;">Chưa liên kết</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="drama-layout">
+          <!-- Left: Settings & Pipeline -->
+          <div class="glass-card drama-sidebar">
+            <h3 style="font-size: 16px; font-weight: 700;">⚙️ Thiết lập sản xuất Phim</h3>
+
+            <div class="form-group">
+              <label>Thể loại Drama</label>
+              <select id="dramaGenre">
+                <option value="Tổng tài ngầm / Bí mật thân phận / Báo thù" selected>Tổng tài ngầm / Bí mật thân phận / Báo thù</option>
+                <option value="Gia đình / Mẹ chồng nàng dâu / Báo thù">Gia đình / Mẹ chồng nàng dâu / Báo thù</option>
+                <option value="Tình yêu / Phản bội / Đòi lại công lý">Tình yêu / Phản bội / Đòi lại công lý</option>
+                <option value="Nông thôn / Ý chí vươn lên đổi đời">Nông thôn / Ý chí vươn lên đổi đời</option>
+                <option value="Phóng sự điều tra / Phơi bày góc khuất">Phóng sự điều tra / Phơi bày góc khuất</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Ý tưởng phim (Hoặc kịch bản cốt lõi)</label>
+              <textarea id="dramaIdea" rows="3" placeholder="Nhập ý tưởng phim... Ví dụ: Chàng rể lái xe ôm công nghệ bị cả dòng họ vợ sỉ nhục trong tiệc mừng thọ..."></textarea>
+              <button type="button" class="btn-secondary" style="margin-top: 6px; width: 100%; font-size: 11px;" onclick="suggestDramaIdeas()">💡 AI Gợi ý 5 ý tưởng kịch tính</button>
+            </div>
+
+            <div class="form-group">
+              <label>Thời lượng phim</label>
+              <select id="dramaDuration">
+                <option value="1">1 Phút (4 clips 15s - Test nhanh)</option>
+                <option value="3">3 Phút (12 clips 15s)</option>
+                <option value="5" selected>5 Phút (20 clips 15s - Chuẩn điện ảnh)</option>
+                <option value="10">10 Phút (40 clips 15s - Phim ngắn đầy đủ)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Giọng đọc MC Lời bình</label>
+              <select id="dramaAccent">
+                <option value="Nam Bắc Bộ 45 tuổi (Trầm ấm, uy quyền)" selected>Nam Bắc Bộ 45 tuổi (Trầm ấm, uy quyền - Mặc định)</option>
+                <option value="Nam Nam Bộ 40 tuổi (Truyền cảm, phóng khoáng)">Nam Nam Bộ 40 tuổi (Truyền cảm, phóng khoáng)</option>
+                <option value="Nữ Bắc Bộ 30 tuổi (Sâu lắng, cảm xúc)">Nữ Bắc Bộ 30 tuổi (Sâu lắng, cảm xúc)</option>
+                <option value="Nữ Nam Bộ 28 tuổi (Ngọt ngào, tự sự)">Nữ Nam Bộ 28 tuổi (Ngọt ngào, tự sự)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Kết thúc câu chuyện</label>
+              <select id="dramaEnding">
+                <option value="Nhân quả xứng đáng (Gieo gió gặt bão)" selected>Nhân quả xứng đáng (Gieo gió gặt bão)</option>
+                <option value="Day dứt / Nuối tiếc">Day dứt / Nuối tiếc</option>
+                <option value="Cliffhanger">Cliffhanger (Bí mật mở cho tập sau)</option>
+                <option value="Happy Ending">Happy Ending trọn vẹn</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn-primary" id="btnStartPipeline" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); font-size: 14px; padding: 14px 10px;" onclick="startDramaFullPipeline()">
+              <span id="btnPipelineText">🚀 TẠO PHIM DRAMA TRỌN GÓI</span>
+            </button>
+
+            <!-- Pipeline Tracker -->
+            <div class="pipeline-tracker" id="pipelineBox">
+              <div class="pipeline-header">
+                <span>TIẾN TRÌNH SẢN XUẤT</span>
+                <span id="pipelineProgressLabel">0 / 7 Hoàn tất</span>
+              </div>
+              <div class="pipeline-steps">
+                <div class="pipeline-step" id="step1">
+                  <span class="step-icon">1</span>
+                  <span>Khởi tạo kịch bản với API Key Muse</span>
+                </div>
+                <div class="pipeline-step" id="step2">
+                  <span class="step-icon">2</span>
+                  <span>Tối ưu chuỗi Prompts Muse IVS</span>
+                </div>
+                <div class="pipeline-step" id="step3">
+                  <span class="step-icon">3</span>
+                  <span>Tạo phụ đề chuẩn SRT millisecond</span>
+                </div>
+                <div class="pipeline-step" id="step4">
+                  <span class="step-icon">4</span>
+                  <span>Vẽ ảnh Storyboard Keyframes</span>
+                </div>
+                <div class="pipeline-step" id="step5">
+                  <span class="step-icon">5</span>
+                  <span>Lồng tiếng AI Voice (MC & Thoại)</span>
+                </div>
+                <div class="pipeline-step" id="step6">
+                  <span class="step-icon">6</span>
+                  <span>Dựng phim & Ghép hiệu ứng Ken Burns</span>
+                </div>
+                <div class="pipeline-step" id="step7">
+                  <span class="step-icon">7</span>
+                  <span>Xuất bản Video Thành Phẩm 🎥</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Result Views -->
+          <div class="glass-card" style="padding: 20px;">
+            <div class="drama-subtabs">
+              <button class="drama-subtab-btn active" onclick="switchDramaSubtab('dsub-video')">🎥 Video Thành Phẩm</button>
+              <button class="drama-subtab-btn" onclick="switchDramaSubtab('dsub-prompts')">⚡ Chuỗi Prompt Muse AI</button>
+              <button class="drama-subtab-btn" onclick="switchDramaSubtab('dsub-story')">📖 Toàn văn Kịch bản</button>
+              <button class="drama-subtab-btn" onclick="switchDramaSubtab('dsub-srt')">💬 Phụ đề SRT</button>
+              <button class="drama-subtab-btn" onclick="switchDramaSubtab('dsub-storyboard')">🎨 Storyboard Keyframes</button>
+              <button class="drama-subtab-btn" onclick="switchDramaSubtab('dsub-voice')">🎙️ Lồng tiếng Voice</button>
+            </div>
+
+            <!-- SUB-TAB 1: VIDEO PLAYER -->
+            <div id="dsub-video" class="drama-pane active">
+              <div class="cinematic-player-box">
+                <div class="video-screen-wrapper">
+                  <canvas id="dramaCanvas" width="1280" height="720"></canvas>
+                  <video id="renderedVideoPlayer" controls></video>
+                  <div id="videoOverlayEmpty" class="video-overlay-placeholder">
+                    <span style="font-size: 48px;">🎬</span>
+                    <h3>Sẵn sàng sản xuất Phim Drama</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); max-width: 450px;">
+                      Nhấn nút <strong>"🚀 TẠO PHIM DRAMA TRỌN GÓI"</strong> ở bảng bên trái. Hệ thống sẽ tự động ghép ảnh Ken Burns, lồng tiếng voiceover tiếng Việt và phụ đề phim!
+                    </p>
+                  </div>
+                </div>
+
+                <div class="video-controls-bar">
+                  <div class="player-actions-left">
+                    <button type="button" class="btn-player primary" id="btnPlayLiveCanvas" onclick="toggleCanvasPlay()">
+                      <span id="playIconText">▶️ Phát Video</span>
+                    </button>
+                    <span class="video-time-display" id="videoTimeTrack">00:00 / 00:00</span>
+                  </div>
+
+                  <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn-player" id="btnDownloadVideo" onclick="downloadRenderedVideo()" disabled>
+                      ⬇️ Tải Video (.webm)
+                    </button>
+                    <button type="button" class="btn-player" onclick="downloadAllDramaAssets()">
+                      📦 Tải Trọn Bộ (ZIP)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUB-TAB 2: PROMPTS -->
+            <div id="dsub-prompts" class="drama-pane">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <strong id="dramaPromptsCount" style="color: #f59e0b;">0 Prompts Muse AI</strong>
+                <button type="button" class="btn-secondary" onclick="copyAllDramaPrompts()">Copy toàn bộ Prompts 📋</button>
+              </div>
+              <div id="dramaPromptsList" style="max-height: 520px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: var(--text-muted); text-align: center; padding: 30px 0;">Chưa có dữ liệu prompt.</p>
+              </div>
+            </div>
+
+            <!-- SUB-TAB 3: STORY -->
+            <div id="dsub-story" class="drama-pane">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <strong id="dramaStoryTitle" style="color: #38bdf8;">Kịch bản chi tiết</strong>
+                <button type="button" class="btn-secondary" onclick="copyField('dramaStoryMarkdown')">Copy kịch bản 📋</button>
+              </div>
+              <textarea id="dramaStoryMarkdown" rows="18" readonly style="font-family: var(--font-mono); font-size: 12px; background: rgba(0,0,0,0.35); color: #cbd5e1;"></textarea>
+            </div>
+
+            <!-- SUB-TAB 4: SRT SUBTITLES -->
+            <div id="dsub-srt" class="drama-pane">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span>Phụ đề SRT đồng bộ từng mili-giây (Dùng cho CapCut / Premiere):</span>
+                <button type="button" class="btn-secondary" onclick="downloadSrtDirect()">Tải file .SRT ⬇️</button>
+              </div>
+              <textarea id="dramaSrtText" rows="18" readonly style="font-family: var(--font-mono); font-size: 12px; background: rgba(0,0,0,0.35); color: #7dd3fc;"></textarea>
+            </div>
+
+            <!-- SUB-TAB 5: STORYBOARD KEYFRAMES -->
+            <div id="dsub-storyboard" class="drama-pane">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span>Hình ảnh phân cảnh phác thảo (Tạo bởi Muse Image API):</span>
+                <span id="sbCount" style="color: #f59e0b;">0 hình ảnh</span>
+              </div>
+              <div class="storyboard-cards-grid" id="dramaStoryboardGrid">
+                <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: 40px 0;">Chưa có hình ảnh storyboard.</p>
+              </div>
+            </div>
+
+            <!-- SUB-TAB 6: VOICE & AUDIO -->
+            <div id="dsub-voice" class="drama-pane">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span>Danh sách giọng đọc MC & Thoại nhân vật từng phân cảnh:</span>
+                <button type="button" class="btn-secondary" onclick="speakAllScenesSequentially()">Nghe thử toàn bộ 🔊</button>
+              </div>
+              <div class="voice-track-list" id="dramaVoiceList">
+                <p style="color: var(--text-muted); text-align: center; padding: 30px 0;">Chưa có dữ liệu giọng đọc.</p>
               </div>
             </div>
           </div>
